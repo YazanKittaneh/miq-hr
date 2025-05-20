@@ -1,7 +1,7 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users } from './schema';
-import type { User } from './schema';
+import type { User, userRole } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
@@ -146,6 +146,15 @@ export async function validateUserRole(requiredRole: User['role']) {
     manager: 3,
     super_manager: 4
   };
+  
 
   return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
 }
+
+// export async function sendInvitationEmail(email: string, name: string, role: typeof userRole){}
+//   const user = await getUser();
+//   if (!user) return false;
+
+//   const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
+
+// }
