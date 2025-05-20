@@ -225,12 +225,20 @@ function InviteTeamMember() {
               disabled={!isManager}
             >
               <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+                <RadioGroupItem value="employee" id="employee" />
+                <Label htmlFor="employee">Employee</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="manager" id="manager" />
-                <Label htmlFor="manager">manager</Label>
+                <Label htmlFor="manager">Manager</Label>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <RadioGroupItem value="hr" id="hr" />
+                <Label htmlFor="hr">HR Member</Label>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <RadioGroupItem value="super-manager" id="super-manager" />
+                <Label htmlFor="super-manager">Super-Manager</Label>
               </div>
             </RadioGroup>
           </div>
@@ -243,7 +251,7 @@ function InviteTeamMember() {
           <Button
             type="submit"
             className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isInvitePending || !isManager}
+            disabled={isInvitePending || !isHR}
           >
             {isInvitePending ? (
               <>
