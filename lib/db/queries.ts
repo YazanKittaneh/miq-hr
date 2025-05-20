@@ -162,6 +162,28 @@ export async function validateUserRole(requiredRole: User['role']) {
   return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
 }
 
+export async function getTeamMembers() {
+  const user = await getUser();
+  if (!user) throw new Error('Unauthorized');
+
+  const team = await getTeamForUser();
+  if (!team) throw new Error('User not part of a team');
+
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      jobTitle: users.jobTitle,
+      department: users.department,
+      phone: users.phone,
+      address: users.address
+    })
+    .from(users)
+    .innerJoin(teamMembers, eq(users.id, teamMembers.userId))
+    .where(eq(teamMembers.teamId, team.id));
+}
+
 // export async function sendInvitationEmail(email: string, name: string, role: typeof userRole){}
 //   const user = await getUser();
 //   if (!user) return false;
