@@ -1,6 +1,7 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users } from './schema';
+import type { User } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
@@ -127,4 +128,24 @@ export async function getTeamForUser() {
   });
 
   return result?.team || null;
+}
+
+export async function getUserRole() {
+  const user = await getUser();
+  return user?.role ?? null;
+}
+
+export async function validateUserRole(requiredRole: User['role']) {
+  const user = await getUser();
+  if (!user) return false;
+  
+  // Define role hierarchy
+  const roleHierarchy: Record<User['role'], number> = {
+    employee: 1,
+    hr: 2,
+    manager: 3,
+    super_manager: 4
+  };
+
+  return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
 }
