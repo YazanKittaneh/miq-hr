@@ -25,7 +25,18 @@ export async function getUser() {
   }
 
   const user = await db
-    .select()
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      jobTitle: users.jobTitle,
+      department: users.department,
+      phone: users.phone,
+      address: users.address,
+      createdAt: users.createdAt,
+      passwordHash: users.passwordHash
+    })
     .from(users)
     .where(and(eq(users.id, sessionData.user.id), isNull(users.deletedAt)))
     .limit(1);

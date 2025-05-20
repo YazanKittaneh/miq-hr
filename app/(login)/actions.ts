@@ -347,21 +347,41 @@ export const deleteAccount = validatedActionWithUser(
 
 const updateAccountSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  email: z.string().email('Invalid email address')
+  email: z.string().email('Invalid email address'),
+  jobTitle: z.string().optional(),
+  department: z.string().optional(),
+  phone: z.string().optional(),
+  address: z.string().optional()
 });
 
 export const updateAccount = validatedActionWithUser(
   updateAccountSchema,
   async (data, _, user) => {
-    const { name, email } = data;
+    const { name, email, jobTitle, department, phone, address } = data;
     const userWithTeam = await getUserWithTeam(user.id);
 
     await Promise.all([
-      db.update(users).set({ name, email }).where(eq(users.id, user.id)),
+      db.update(users)
+        .set({ 
+          name, 
+          email,
+          jobTitle,
+          department,
+          phone, 
+          address
+        })
+        .where(eq(users.id, user.id)),
       logActivity(userWithTeam?.teamId, user.id, ActivityType.UPDATE_ACCOUNT)
     ]);
 
-    return { name, success: 'Account updated successfully.' };
+    return { 
+      success: 'Profile updated successfully.',
+      name,
+      jobTitle,
+      department,
+      phone,
+      address
+    };
   }
 );
 

@@ -15,6 +15,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ActionState = {
   name?: string;
+  jobTitle?: string;
+  department?: string;
+  phone?: string;
+  address?: string;
   error?: string;
   success?: string;
 };
@@ -23,12 +27,20 @@ type AccountFormProps = {
   state: ActionState;
   nameValue?: string;
   emailValue?: string;
+  jobTitleValue?: string;
+  departmentValue?: string;
+  phoneValue?: string;
+  addressValue?: string;
 };
 
 function AccountForm({
   state,
   nameValue = '',
-  emailValue = ''
+  emailValue = '',
+  jobTitleValue = '',
+  departmentValue = '',
+  phoneValue = '',
+  addressValue = ''
 }: AccountFormProps) {
   return (
     <>
@@ -57,6 +69,50 @@ function AccountForm({
           required
         />
       </div>
+      <div>
+        <Label htmlFor="jobTitle" className="mb-2">
+          Job Title
+        </Label>
+        <Input
+          id="jobTitle"
+          name="jobTitle"
+          placeholder="Enter your job title"
+          defaultValue={state.jobTitle || jobTitleValue}
+        />
+      </div>
+      <div>
+        <Label htmlFor="department" className="mb-2">
+          Department
+        </Label>
+        <Input
+          id="department"
+          name="department"
+          placeholder="Enter your department"
+          defaultValue={state.department || departmentValue}
+        />
+      </div>
+      <div>
+        <Label htmlFor="phone" className="mb-2">
+          Phone
+        </Label>
+        <Input
+          id="phone"
+          name="phone"
+          placeholder="Enter your phone number"
+          defaultValue={state.phone || phoneValue}
+        />
+      </div>
+      <div>
+        <Label htmlFor="address" className="mb-2">
+          Address
+        </Label>
+        <Input
+          id="address"
+          name="address"
+          placeholder="Enter your address"
+          defaultValue={state.address || addressValue}
+        />
+      </div>
     </>
   );
 }
@@ -68,6 +124,10 @@ function AccountFormWithData({ state }: { state: ActionState }) {
       state={state}
       nameValue={user?.name ?? ''}
       emailValue={user?.email ?? ''}
+      jobTitleValue={user?.jobTitle ?? ''}
+      departmentValue={user?.department ?? ''}
+      phoneValue={user?.phone ?? ''}
+      addressValue={user?.address ?? ''}
     />
   );
 }

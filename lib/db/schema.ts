@@ -17,6 +17,10 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   role: userRole('role').notNull().default('employee'),
+  jobTitle: varchar('job_title', { length: 100 }),
+  department: varchar('department', { length: 100 }),
+  phone: varchar('phone', { length: 20 }),
+  address: text('address'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
@@ -117,6 +121,10 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
 
 export type User = typeof users.$inferSelect & {
   role: 'employee' | 'hr' | 'manager' | 'super_manager';
+  jobTitle?: string;
+  department?: string;
+  phone?: string;
+  address?: string;
 };
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
