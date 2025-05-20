@@ -5,15 +5,18 @@ import {
   text,
   timestamp,
   integer,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
+export const userRole = pgEnum('user_role', ['employee', 'hr', 'manager', 'super_manager']);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  role: varchar('role', { length: 20 }).notNull().default('member'),
+  role: userRole('role').notNull().default('employee'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
@@ -112,7 +115,9 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   }),
 }));
 
-export type User = typeof users.$inferSelect;
+export type User = typeof users.$inferSelect & {
+  role: 'employee' | 'hr' | 'manager' | 'super_manager';
+};
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;

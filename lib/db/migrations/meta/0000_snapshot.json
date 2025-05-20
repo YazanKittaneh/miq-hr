@@ -338,10 +338,10 @@
         },
         "role": {
           "name": "role",
-          "type": "varchar(20)",
+          "type": "user_role",
           "primaryKey": false,
           "notNull": true,
-          "default": "'member'"
+          "default": "'employee'"
         },
         "created_at": {
           "name": "created_at",
@@ -378,7 +378,12 @@
       }
     }
   },
-  "enums": {},
+  "enums": {
+    "user_role": {
+      "name": "user_role",
+      "values": ["employee", "hr", "manager", "super_manager"]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "_meta": {
