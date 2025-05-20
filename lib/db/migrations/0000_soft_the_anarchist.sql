@@ -1,3 +1,5 @@
+CREATE TYPE "user_role" AS ENUM ('employee', 'hr', 'manager', 'super_manager');
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "activity_logs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"team_id" integer NOT NULL,
