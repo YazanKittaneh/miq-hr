@@ -59,13 +59,23 @@ export default function GeneralPage() {
     {}
   );
   const [isEditing, setIsEditing] = useState(false);
-  const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
+  const [formKey, setFormKey] = useState(0); // Add form version key
+  const { data: user, isLoading, mutate } = useSWR<User>('/api/user', fetcher);
 
   useEffect(() => {
     if (!isPending && state?.success) {
       setIsEditing(false);
+      // Reset form state on success
+      setFormKey(prev => prev + 1);
+      mutate(state.user); // Update SWR cache with latest data
     }
-  }, [isPending, state?.success]);
+  }, [isPending, state?.success, state?.user, mutate]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    // Reset any previous success/error states
+    setFormKey(prev => prev + 1);
+  };
 
   if (isLoading) return <div className="text-center p-8">Loading...</div>;
 
@@ -81,9 +91,13 @@ export default function GeneralPage() {
         </CardHeader>
         <CardContent>
           <form 
+            key={formKey} // Add form version key
             className="space-y-4" 
             action={(formData) => {
-              formAction(formData);
+              // Preserve read-only fields
+              formData.set('name', user?.name || '');
+              formData.set('email', user?.email || '');
+              return formAction(formData);
             }}
           >
             <AccountForm user={user} isEditing={isEditing} />
@@ -102,7 +116,7 @@ export default function GeneralPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsEditing(true)}
+                  onClick={handleEditClick} // Use new handler
                 >
                   Edit Information
                 </Button>
