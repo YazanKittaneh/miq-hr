@@ -82,6 +82,33 @@ To test Stripe payments, use the following test card details:
 - Expiration: Any future date
 - CVC: Any 3-digit number
 
+## Troubleshooting
+
+### Database Migration Issues
+
+If you encounter errors when running database migration commands (`pnpm db:generate`, `pnpm db:migrate`, or `pnpm db:push`), try this temporary fix:
+
+1. **Modify your connection string** to use port `5432` instead of `6543`:
+```bash
+# Example Supabase connection string modification:
+POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres"
+```
+
+2. **Run your migration commands**:
+```bash
+pnpm db:generate && pnpm db:migrate
+```
+
+3. **Revert the port** in your connection string to `6543` after successful migration:
+```bash
+POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
+```
+
+This port switch appears to resolve temporary connection issues with some Supabase instances during migration operations. Remember to always:
+- Keep your database credentials secure
+- Double-check your connection string formatting
+- Verify your Supabase instance's network settings
+
 ## Going to Production
 
 When you're ready to deploy your SaaS application to production, follow these steps:
