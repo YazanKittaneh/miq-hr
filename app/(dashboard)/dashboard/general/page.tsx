@@ -107,13 +107,17 @@ function AccountForm({
             />
           </div>
           <Button
-            type="button"
+            type={localEditable[field] ? "submit" : "button"}
             variant="outline"
             size="sm"
-            onClick={() => toggleEditable(field)}
+            onClick={() => {
+              if (!localEditable[field]) {
+                toggleEditable(field);
+              }
+            }}
             className="mb-[0.3rem]"
           >
-            {localEditable[field] ? 'Cancel' : 'Edit'}
+            {localEditable[field] ? 'Save' : 'Edit'}
           </Button>
         </div>
       ))}
@@ -199,22 +203,6 @@ export default function GeneralPage() {
             )}
             {state.success && (
               <p className="text-green-500 text-sm">{state.success}</p>
-            )}
-            {hasEditableFields && (
-              <Button
-                type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
-                disabled={isPending}
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save Changes'
-                )}
-              </Button>
             )}
           </form>
         </CardContent>
