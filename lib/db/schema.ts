@@ -10,6 +10,13 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+export const departments = pgTable('departments', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
 export const userRole = pgEnum('user_role', ['employee', 'hr', 'manager', 'super_manager']);
 
 export const users = pgTable('users', {
@@ -19,7 +26,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   role: userRole('role').notNull().default('employee'),
   jobTitle: varchar('job_title', { length: 100 }),
-  department: varchar('department', { length: 100 }),
+  department: integer('department_id').references(() => departments.id),
   phone: varchar('phone', { length: 20 }),
   address: text('address'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -83,9 +90,17 @@ export const teamsRelations = relations(teams, ({ many }) => ({
   invitations: many(invitations),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   teamMembers: many(teamMembers),
   invitationsSent: many(invitations),
+  department: one(departments, {
+    fields: [users.department],
+    references: [departments.id],
+  }),
+}));
+
+export const departmentsRelations = relations(departments, ({ many }) => ({
+  users: many(users),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -124,7 +139,7 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
 export type User = typeof users.$inferSelect & {
   role: 'employee' | 'hr' | 'manager' | 'super_manager';
   jobTitle?: string;
-  department?: string;
+  department?: number; // Now references department ID
   phone?: string;
   address?: string;
   salary?: number;
