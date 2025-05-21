@@ -27,50 +27,51 @@ type ActionState = {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function SubscriptionSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
+// function SubscriptionSkeleton() {
+//   return (
+//     <Card className="mb-8 h-[140px]">
+//       <CardHeader>
+//         <CardTitle>Team Subscription</CardTitle>
+//       </CardHeader>
+//     </Card>
+//   );
+// }
 
-function ManageSubscription() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+// function ManageSubscription() {
+//   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
 
-  return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium">
-                Current Plan: {teamData?.planName || 'Free'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.subscriptionStatus === 'active'
-                  ? 'Billed monthly'
-                  : teamData?.subscriptionStatus === 'trialing'
-                  ? 'Trial period'
-                  : 'No active subscription'}
-              </p>
-            </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
-                Manage Subscription
-              </Button>
-            </form>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+//   return (
+//     <Card className="mb-8">
+//       <CardHeader>
+//         <CardTitle>Team Subscription</CardTitle>
+//       </CardHeader>
+//       <CardContent>
+//         <div className="space-y-4">
+//           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+//             <div className="mb-4 sm:mb-0">
+//               <p className="font-medium">
+//                 Current Plan: {teamData?.planName || 'Free'}
+//               </p>
+//               <p className="text-sm text-muted-foreground">
+//                 {teamData?.subscriptionStatus === 'active'
+//                   ? 'Billed monthly'
+//                   : teamData?.subscriptionStatus === 'trialing'
+//                   ? 'Trial period'
+//                   : 'No active subscription'}
+//               </p>
+//             </div>
+//             <form action={customerPortalAction}>
+//               <Button type="submit" variant="outline">
+//                 Manage Subscription
+//               </Button>
+//             </form>
+//           </div>
+//         </div>
+//       </CardContent>
+//     </Card>
+//   );
+// }
+
 
 function TeamMembersSkeleton() {
   return (
@@ -95,6 +96,7 @@ function TeamMembersSkeleton() {
 
 function TeamMembers() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const { data: user } = useSWR<User>('/api/user', fetcher);
   const [removeState, removeAction, isRemovePending] = useActionState<
     ActionState,
     FormData
@@ -197,75 +199,71 @@ function InviteTeamMember() {
   >(inviteTeamMember, {});
 
   return (
-    <Card>
+    <Card hidden={!isHR} >
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form action={inviteAction} className="space-y-4">
-          <div>
-            <Label htmlFor="email" className="mb-2">
-              Email
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter email"
-              required
-              disabled={!isManager}
-            />
-          </div>
-          <div>
-            <Label>Role</Label>
-            <RadioGroup
-              defaultValue="member"
-              name="role"
-              className="flex space-x-4"
-              disabled={!isManager}
-            >
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+          <CardTitle>Invite Team Member</CardTitle>
+        </CardHeader><CardContent>
+            <form action={inviteAction} className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="mb-2">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter email"
+                  required
+                  disabled={!isManager} />
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="manager" id="manager" />
-                <Label htmlFor="manager">manager</Label>
+              <div>
+                <Label>Role</Label>
+                <RadioGroup
+                  defaultValue="member"
+                  name="role"
+                  className="flex space-x-4"
+                  disabled={!isManager}
+                >
+                  <div className="flex items-center space-x-2 mt-2">
+                    <RadioGroupItem value="member" id="member" />
+                    <Label htmlFor="member">Member</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <RadioGroupItem value="manager" id="manager" />
+                    <Label htmlFor="manager">manager</Label>
+                  </div>
+                </RadioGroup>
               </div>
-            </RadioGroup>
-          </div>
-          {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
-          )}
-          {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
-          )}
-          <Button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isInvitePending || !isManager}
-          >
-            {isInvitePending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Inviting...
-              </>
-            ) : (
-              <>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Invite Member
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-      {!isHR&& (
+              {inviteState?.error && (
+                <p className="text-red-500">{inviteState.error}</p>
+              )}
+              {inviteState?.success && (
+                <p className="text-green-500">{inviteState.success}</p>
+              )}
+              <Button
+                type="submit"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                disabled={isInvitePending || !isManager}
+              >
+                {isInvitePending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Inviting...
+                  </>
+                ) : (
+                  <>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Invite Member
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
         <CardFooter>
           <p className="text-sm text-muted-foreground">
             You must be an HR member to invite new members.
           </p>
         </CardFooter>
-      )}
     </Card>
   );
 }
@@ -274,15 +272,13 @@ export default function SettingsPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
-      </Suspense>
       <Suspense fallback={<TeamMembersSkeleton />}>
         <TeamMembers />
       </Suspense>
       <Suspense fallback={<InviteTeamMemberSkeleton />}>
         <InviteTeamMember />
       </Suspense>
+      
     </section>
   );
 }

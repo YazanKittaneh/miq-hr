@@ -1,8 +1,16 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CreditCard, Database, User, ClipboardList, Settings, FileText, Download, Key, UserPlus, FileEdit } from 'lucide-react';
+import { ArrowRight, CreditCard, Database, ClipboardList, Settings, FileText, Download, Key, UserPlus, FileEdit } from 'lucide-react';
 import { Terminal } from './terminal';
+import { User, userRole } from '@/lib/db/schema';
+import useSWR from 'swr';
+import { validateUserRole } from '@/lib/db/queries';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function HomePage() {
+  const { data: user } = useSWR<User>('/api/user', fetcher);
   return (
     <main>
       <section className="py-12">
@@ -12,33 +20,40 @@ export default function HomePage() {
               <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
                 Welcome to MiQ People Portal
                 <span className="block text-orange-500 mt-4 text-3xl sm:text-4xl">
-                  John Doe {/* Dynamic name */}
+                  {user?.name || ''}
                 </span>
               </h1>
+
+
+              {user && (
+
               <div className="mt-6 space-y-2">
                 <p className="text-lg text-gray-600">
-                  Employee ID: MIQ-12345
+                  {'Employee ID: ' + user?.id || ''}
                 </p>
                 <p className="text-lg text-gray-600">
-                  Position: Digital Marketing Specialist
+                  {'Position: ' + user?.jobTitle || ''}
                 </p>
                 <p className="text-lg text-gray-600">
-                  Department: Client Services
+                  {'Department: ' + user?.department || ''}
                 </p>
               </div>
-              <div className="mt-6 flex gap-4">
-                <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
-                  Onboarding Status: 60% Complete
-                </span>
-                <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
-                  Employment Status: Active
-                </span>
-              </div>
+              )}
+              {user && (
+                <div className="mt-6 flex gap-4">
+                  <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
+                    Onboarding Status: 60% Complete {/* //todo: make this programatic */}
+                  </span>
+                  <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
+                    Employment Status: Active
+                  </span>
+                </div>
+              )}
             </div>
             <div className="mt-12 lg:mt-0 lg:col-span-6">
               <div className="bg-white p-6 rounded-lg shadow">
                 <h2 className="text-xl font-semibold mb-4">
-                  Upcoming Requirements
+                {user && ('Upcoming Requirements') || ('Sign Up Today to') }
                 </h2>
                 <ul className="space-y-3">
                   <li className="flex items-center">
@@ -60,22 +75,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {user && (
       <section className="py-16 bg-white w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             {/* Personal Details Card */}
+
             <div>
               <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
-                <User className="h-6 w-6" />
+                <UserPlus className="h-6 w-6" />
               </div>
               <div className="mt-5">
                 <h2 className="text-lg font-medium text-gray-900">
                   Personal Information
                 </h2>
                 <div className="mt-4 space-y-2">
-                  <p className="text-gray-600">Email: john.doe@miqdigital.com</p>
-                  <p className="text-gray-600">Phone: +1 555-123-4567</p>
-                  <p className="text-gray-600">Address: New York, NY</p>
+                  <p className="text-gray-600">Email: {user.email}</p>
+                  <p className="text-gray-600">Phone: {user.phone}</p>
+                  <p className="text-gray-600">Address: {user.address}</p>
                 </div>
                 <Button className="mt-4" variant="outline">
                   Update Details
@@ -83,7 +100,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Onboarding Progress Card */}
+
+            {/* Onboarding Progress Card 
             <div className="mt-10 lg:mt-0">
               <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
                 <ClipboardList className="h-6 w-6" />
@@ -98,8 +116,8 @@ export default function HomePage() {
                     <span className="text-orange-600">3/5 completed</span>
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full">
-                    <div 
-                      className="h-2 bg-orange-500 rounded-full" 
+                    <div
+                      className="h-2 bg-orange-500 rounded-full"
                       style={{ width: '60%' }}
                     ></div>
                   </div>
@@ -109,6 +127,7 @@ export default function HomePage() {
                 </Button>
               </div>
             </div>
+            */}
 
             {/* Quick Actions Card */}
             <div className="mt-10 lg:mt-0">
@@ -138,8 +157,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
+    )}
       {/* HR Section - Only visible to authorized roles */}
+      {user?.jobTitle === 'hr' && (
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -162,6 +182,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
     </main>
   );
 }
