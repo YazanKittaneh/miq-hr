@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   pgEnum,
+  numeric,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -23,6 +24,7 @@ export const users = pgTable('users', {
   address: text('address'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  salary: numeric('salary', { precision: 10, scale: 2 }),
   deletedAt: timestamp('deleted_at'),
 });
 
@@ -125,6 +127,7 @@ export type User = typeof users.$inferSelect & {
   department?: string;
   phone?: string;
   address?: string;
+  salary?: number;
 };
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;

@@ -46,6 +46,7 @@ export const users = pgTable("users", {
 	role: varchar({ length: 20 }).default('member').notNull(),
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+	salary: numeric("salary", { precision: 10, scale: 2 }),
 	deletedAt: timestamp("deleted_at", { mode: 'string' }),
 }, (table) => [
 	unique("users_email_unique").on(table.email),
