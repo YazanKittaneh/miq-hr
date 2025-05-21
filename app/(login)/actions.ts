@@ -98,9 +98,6 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     return createCheckoutSession({ team: foundTeam, priceId });
   }
 
-  if (foundUser.role === 'hr') {
-    redirect('/hr-dashboard');
-  }
   redirect('/dashboard');
 });
 
@@ -222,9 +219,6 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     return createCheckoutSession({ team: createdTeam, priceId });
   }
 
-  if (createdUser.role === 'hr') {
-    redirect('/hr-dashboard');
-  }
   redirect('/dashboard');
 });
 
