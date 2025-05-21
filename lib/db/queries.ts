@@ -184,6 +184,28 @@ export async function getTeamMembers() {
     .where(eq(teamMembers.teamId, team.id));
 }
 
+export async function getAllUsers() {
+  // Require at least HR-level permissions
+  const isAuthorized = await validateUserRole('hr');
+  if (!isAuthorized) throw new Error('Unauthorized');
+
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      jobTitle: users.jobTitle,
+      department: users.department,
+      phone: users.phone,
+      address: users.address,
+      createdAt: users.createdAt
+    })
+    .from(users)
+    .where(isNull(users.deletedAt))  // Exclude soft-deleted users
+    .orderBy(desc(users.createdAt)); // Newest users first
+}
+
 // export async function sendInvitationEmail(email: string, name: string, role: typeof userRole){}
 //   const user = await getUser();
 //   if (!user) return false;
