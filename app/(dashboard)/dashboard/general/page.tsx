@@ -1,152 +1,55 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useState, useEffect } from 'react';
+import { useActionState, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { updateAccount } from '@/app/(login)/actions';
-import { User } from '@/lib/db/schema';
 import useSWR from 'swr';
-import { Suspense } from 'react';
+import { User } from '@/lib/db/schema';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ActionState = {
-  name?: string;
-  jobTitle?: string;
-  department?: string;
-  phone?: string;
-  address?: string;
   error?: string;
   success?: string;
 };
 
-type AccountFormProps = {
-  state: ActionState;
-  nameValue?: string;
-  emailValue?: string;
-  jobTitleValue?: string;
-  departmentValue?: string;
-  phoneValue?: string;
-  addressValue?: string;
-  onEditableChange: (field: string, editable: boolean) => void;
-  editableFields: Record<string, boolean>;
-};
-
 function AccountForm({
-  state,
-  nameValue = '',
-  emailValue = '',
-  jobTitleValue = '',
-  departmentValue = '',
-  phoneValue = '',
-  addressValue = '',
-  onEditableChange,
-  editableFields
-}: AccountFormProps) {
-  const [localEditable, setLocalEditable] = useState<Record<string, boolean>>({
-    jobTitle: false,
-    department: false,
-    phone: false,
-    address: false
-  });
+  user,
+  isEditing
+}: {
+  user?: User;
+  isEditing: boolean;
+}) {
+  const fields = [
+    { id: 'name', label: 'Name', value: user?.name, disabled: true },
+    { id: 'email', label: 'Email', value: user?.email, disabled: true },
+    { id: 'jobTitle', label: 'Job Title', value: user?.jobTitle },
+    { id: 'department', label: 'Department', value: user?.department },
+    { id: 'phone', label: 'Phone', value: user?.phone },
+    { id: 'address', label: 'Address', value: user?.address }
+  ];
 
-  const toggleEditable = (field: string) => {
-    setLocalEditable(prev => ({ ...prev, [field]: !prev[field] }));
-    onEditableChange(field, !localEditable[field]);
-  };
   return (
     <>
-      <div>
-        <Label htmlFor="name" className="mb-2">
-          Name
-        </Label>
-        <Input
-          id="name"
-          name="name"
-          placeholder="Enter your name"
-          defaultValue={state.name || nameValue}
-          required
-          disabled
-        />
-      </div>
-      <div>
-        <Label htmlFor="email" className="mb-2">
-          Email
-        </Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter your email"
-          defaultValue={emailValue}
-          required
-          disabled
-        />
-      </div>
-      {['jobTitle', 'department', 'phone', 'address'].map((field) => (
-        <div key={field} className="flex gap-2 items-end">
-          <div className="flex-1">
-            <Label htmlFor={field} className="mb-2 capitalize">
-              {field === 'phone' ? 'Phone Number' : field.replace(/([A-Z])/g, ' $1').trim()}
-            </Label>
-            <Input
-              id={field}
-              name={field}
-              placeholder={`Enter your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
-              defaultValue={
-                (state as any)[field] || 
-                (field === 'jobTitle' ? jobTitleValue :
-                field === 'department' ? departmentValue :
-                field === 'phone' ? phoneValue : addressValue)
-              }
-              disabled={!localEditable[field]}
-            />
-          </div>
-          <Button
-            type={localEditable[field] ? "submit" : "button"}
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (!localEditable[field]) {
-                toggleEditable(field);
-              }
-            }}
-            className="mb-[0.3rem]"
-          >
-            {localEditable[field] ? 'Save' : 'Edit'}
-          </Button>
+      {fields.map((field) => (
+        <div key={field.id} className="mb-4">
+          <Label htmlFor={field.id} className="mb-2">
+            {field.label}
+          </Label>
+          <Input
+            id={field.id}
+            name={field.id}
+            placeholder={`Enter your ${field.label.toLowerCase()}`}
+            defaultValue={field.value || ''}
+            disabled={!isEditing || field.disabled}
+          />
         </div>
       ))}
     </>
-  );
-}
-
-function AccountFormWithData({ 
-  state, 
-  onEditableChange,
-  editableFields 
-}: { 
-  state: ActionState;
-  onEditableChange: (field: string, editable: boolean) => void;
-  editableFields: Record<string, boolean>;
-}) {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  return (
-    <AccountForm
-      state={state}
-      onEditableChange={onEditableChange}
-      editableFields={editableFields}
-      nameValue={user?.name ?? ''}
-      emailValue={user?.email ?? ''}
-      jobTitleValue={user?.jobTitle ?? ''}
-      departmentValue={user?.department ?? ''}
-      phoneValue={user?.phone ?? ''}
-      addressValue={user?.address ?? ''}
-    />
   );
 }
 
@@ -155,29 +58,16 @@ export default function GeneralPage() {
     updateAccount,
     {}
   );
-  const [editableFields, setEditableFields] = useState({
-    jobTitle: false,
-    department: false,
-    phone: false,
-    address: false
-  });
-
-  const handleEditableChange = (field: string, editable: boolean) => {
-    setEditableFields(prev => ({ ...prev, [field]: editable }));
-  };
-
-  const hasEditableFields = Object.values(editableFields).some(Boolean);
+  const [isEditing, setIsEditing] = useState(false);
+  const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
 
   useEffect(() => {
-    if (!isPending) {
-      setEditableFields({
-        jobTitle: false,
-        department: false,
-        phone: false,
-        address: false
-      });
+    if (!isPending && state?.success) {
+      setIsEditing(false);
     }
-  }, [isPending]);
+  }, [isPending, state?.success]);
+
+  if (isLoading) return <div className="text-center p-8">Loading...</div>;
 
   return (
     <section className="flex-1 p-4 lg:p-8">
@@ -191,18 +81,34 @@ export default function GeneralPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-4" action={formAction}>
-            <Suspense fallback={<AccountForm state={state} onEditableChange={handleEditableChange} editableFields={editableFields} />}>
-              <AccountFormWithData 
-                state={state} 
-                onEditableChange={handleEditableChange}
-                editableFields={editableFields}
-              />
-            </Suspense>
-            {state.error && (
-              <p className="text-red-500 text-sm">{state.error}</p>
+            <AccountForm user={user} isEditing={isEditing} />
+            
+            <div className="flex gap-2 justify-end pt-4">
+              {isEditing ? (
+                <Button 
+                  type="submit"
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  disabled={isPending}
+                >
+                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                >
+                  Edit Information
+                </Button>
+              )}
+            </div>
+
+            {state?.error && (
+              <p className="text-red-500 text-sm mt-2">{state.error}</p>
             )}
-            {state.success && (
-              <p className="text-green-500 text-sm">{state.success}</p>
+            {state?.success && (
+              <p className="text-green-500 text-sm mt-2">{state.success}</p>
             )}
           </form>
         </CardContent>
