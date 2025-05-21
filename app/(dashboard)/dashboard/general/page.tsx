@@ -80,7 +80,12 @@ export default function GeneralPage() {
           <CardTitle>Account Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" action={formAction}>
+          <form 
+            className="space-y-4" 
+            action={(formData) => {
+              formAction(formData);
+            }}
+          >
             <AccountForm user={user} isEditing={isEditing} />
             
             <div className="flex gap-2 justify-end pt-4">
