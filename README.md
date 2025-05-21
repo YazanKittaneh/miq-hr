@@ -90,24 +90,25 @@ If you encounter errors when running database migration commands (`pnpm db:gener
 
 1. **Modify your connection string** to use port `5432` instead of `6543`:
 ```bash
-# Example Supabase connection string modification:
+# Change connection string port to 5432
 POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres"
 ```
 
 2. **Run your migration commands**:
 ```bash
-pnpm db:generate && pnpm db:migrate
+pnpm db:generate && pnpm db:migrate && pnpm db:push
 ```
 
 3. **Revert the port** in your connection string to `6543` after successful migration:
 ```bash
+# Restore original port 6543
 POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
 ```
 
-This port switch appears to resolve temporary connection issues with some Supabase instances during migration operations. Remember to always:
-- Keep your database credentials secure
-- Double-check your connection string formatting
-- Verify your Supabase instance's network settings
+This specific port switch pattern (5432 → run commands → 6543) has been verified to resolve temporary connection issues with Supabase instances during migration operations. Always ensure you:
+- Use your actual database credentials in place of `[YOUR-PASSWORD]`
+- Maintain the same instance hostname throughout
+- Test connections after port changes
 
 ## Going to Production
 
