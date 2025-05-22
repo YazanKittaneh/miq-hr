@@ -49,6 +49,7 @@ function TeamMembersSkeleton() {
   );
 }
 
+
 function TeamMembers() {
   const { data: users } = useSWR<User[]>('/api/users', fetcher);
   const { data: currentUser } = useSWR<User>('/api/user', fetcher);
