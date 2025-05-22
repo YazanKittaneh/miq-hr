@@ -68,7 +68,7 @@ function formatAction(action: ActivityType): string {
   }
 }
 
-export default async function ActivityPage() {
+export default async function EmployeePage() {
   const logs = await getActivityLogs();
 
   return (

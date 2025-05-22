@@ -1,6 +1,6 @@
 {
-  "id": "2246d8d4-923a-4c50-b340-c5f419b18739",
-  "prevId": "85cfef74-6e83-405d-88db-ab4cf3c2df68",
+  "id": "baa8d735-5147-41f9-9595-357f370a876c",
+  "prevId": "2246d8d4-923a-4c50-b340-c5f419b18739",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -393,6 +393,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "salary": {
+          "name": "salary",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
         },
         "deleted_at": {
           "name": "deleted_at",

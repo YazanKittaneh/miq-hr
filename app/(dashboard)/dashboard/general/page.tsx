@@ -13,6 +13,7 @@ import { User } from '@/lib/db/schema';
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ActionState = {
+  user?: User;
   error?: string;
   success?: string;
 };

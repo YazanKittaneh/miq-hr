@@ -15,6 +15,13 @@
       "when": 1747714946375,
       "tag": "0001_overrated_slayback",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747821125190,
+      "tag": "0002_gorgeous_nuke",
+      "breakpoints": true
     }
   ]
 }

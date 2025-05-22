@@ -1,7 +1,17 @@
-import { pgTable, unique, serial, varchar, timestamp, text, foreignKey, integer } from "drizzle-orm/pg-core"
+import { pgTable, unique, serial, varchar, timestamp, text, foreignKey, integer, numeric, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
+export const userRole = pgEnum("user_role", ['employee', 'hr', 'manager', 'super_manager'])
 
+
+export const departments = pgTable("departments", {
+	id: serial().primaryKey().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	unique("departments_name_unique").on(table.name),
+]);
 
 export const teams = pgTable("teams", {
 	id: serial().primaryKey().notNull(),
@@ -36,20 +46,6 @@ export const activityLogs = pgTable("activity_logs", {
 			foreignColumns: [users.id],
 			name: "activity_logs_user_id_users_id_fk"
 		}),
-]);
-
-export const users = pgTable("users", {
-	id: serial().primaryKey().notNull(),
-	name: varchar({ length: 100 }),
-	email: varchar({ length: 255 }).notNull(),
-	passwordHash: text("password_hash").notNull(),
-	role: varchar({ length: 20 }).default('member').notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
-	salary: numeric("salary", { precision: 10, scale: 2 }),
-	deletedAt: timestamp("deleted_at", { mode: 'string' }),
-}, (table) => [
-	unique("users_email_unique").on(table.email),
 ]);
 
 export const invitations = pgTable("invitations", {
@@ -90,4 +86,22 @@ export const teamMembers = pgTable("team_members", {
 			foreignColumns: [users.id],
 			name: "team_members_user_id_users_id_fk"
 		}),
+]);
+
+export const users = pgTable("users", {
+	id: serial().primaryKey().notNull(),
+	name: varchar({ length: 100 }),
+	email: varchar({ length: 255 }).notNull(),
+	passwordHash: text("password_hash").notNull(),
+	role: userRole().default('employee').notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+	deletedAt: timestamp("deleted_at", { mode: 'string' }),
+	jobTitle: varchar("job_title", { length: 100 }),
+	departmentId: varchar("department_id", { length: 100 }),
+	phone: varchar({ length: 20 }),
+	address: text(),
+	salary: numeric({ precision: 10, scale:  2 }),
+}, (table) => [
+	unique("users_email_unique").on(table.email),
 ]);
