@@ -110,6 +110,38 @@ This specific port switch pattern (5432 → run commands → 6543) has been veri
 - Maintain the same instance hostname throughout
 - Test connections after port changes
 
+### MCP Server with NVM
+
+If you're using NVM (Node Version Manager) and experiencing issues with MCP server detection, it's likely due to path resolution conflicts between NVM-managed Node and system Node installations.
+
+**Problem:**
+- Path resolution conflicts between NVM-managed Node and system Node
+- Global package paths not being properly resolved through NVM's shim system
+
+**Solution:**
+Bypass NVM's path abstraction by explicitly specifying absolute paths in your configuration:
+
+```json
+{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "$HOME/.nvm/versions/node/v22.11.0/bin/node",
+      "args": [
+        "$HOME/.nvm/versions/node/v22.11.0/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+Replace `v22.11.0` with your actual Node.js version. You can find this by running `node -v` in your terminal.
+
+This configuration explicitly points to:
+1. The NVM-managed Node binary
+2. The globally-installed MCP server package
+
+Avoid using `npx` or local installs that rely on NVM's PATH resolution when working with MCP servers.
+
 ## Going to Production
 
 When you're ready to deploy your SaaS application to production, follow these steps:
