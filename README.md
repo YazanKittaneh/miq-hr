@@ -1,178 +1,102 @@
-# Next.js SaaS Starter
+# MiQ People Portal
 
-This is a starter template for building a SaaS application using **Next.js** with support for authentication, Stripe integration for payments, and a dashboard for logged-in users.
+This is MiQ's internal employee and HR management portal built with **Next.js**. Provides secure access to company resources, employee profiles, and HR tools.
 
-**Demo: [https://next-saas-start.vercel.app/](https://next-saas-start.vercel.app/)**
+**Staging Environment**: [https://people.miq.digital](https://people.miq.digital)
 
-## Features
+## Key Features
 
-- Marketing landing page (`/`) with animated Terminal element
-- Pricing page (`/pricing`) which connects to Stripe Checkout
-- Dashboard pages with CRUD operations on users/teams
-- Basic RBAC with Owner and Member roles
-- Subscription management with Stripe Customer Portal
-- Email/password authentication with JWTs stored to cookies
-- Global middleware to protect logged-in routes
-- Local middleware to protect Server Actions or validate Zod schemas
-- Activity logging system for any user events
+- Employee dashboard with personalized welcome message
+- HR management console with employee directory
+- Role-based access control (RBAC) for:
+  - Employees (basic access)
+  - HR Managers (advanced tools)
+  - Department Heads (team insights)
+- Activity logging for all system interactions
+- Secure authentication with JWT tokens
+- Employee profile management:
+  - Personal details
+  - Job information
+  - Time-off requests
+  - Performance reviews
+- Audit logging for compliance tracking
 
-## Tech Stack
+## Core Technologies
 
-- **Framework**: [Next.js](https://nextjs.org/)
-- **Database**: [Postgres](https://www.postgresql.org/)
-- **ORM**: [Drizzle](https://orm.drizzle.team/)
-- **Payments**: [Stripe](https://stripe.com/)
-- **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
+- **Framework**: [Next.js](https://nextjs.org/) - Optimized for secure internal applications
+- **Database**: [Postgres](https://www.postgresql.org/) - Enterprise-grade data storage
+- **ORM**: [Drizzle](https://orm.drizzle.team/) - Type-safe database operations
+- **Authentication**: Custom JWT implementation - Integrated with MiQ's SSO
+- **UI Library**: [shadcn/ui](https://ui.shadcn.com/) - Accessible internal tooling components
 
-## Getting Started
+## Development Setup
 
 ```bash
-git clone https://github.com/nextjs/saas-starter
-cd saas-starter
+git clone https://github.com/miq-digital/people-portal
+cd people-portal
 pnpm install
 ```
 
-## Running Locally
+## Local Configuration
 
-[Install](https://docs.stripe.com/stripe-cli) and log in to your Stripe account:
-
-```bash
-stripe login
-```
-
-Use the included setup script to create your `.env` file:
+1. Set up environment variables using MiQ's internal configuration tool:
 
 ```bash
-pnpm db:setup
+pnpm setup:miq
 ```
 
-Run the database migrations and seed the database with a default user and team:
+2. Run database migrations with test data:
 
 ```bash
 pnpm db:migrate
 pnpm db:seed
 ```
 
-This will create the following user and team:
+This creates test users with different roles:
+- HR Admin: `hr.admin@miq.digital`
+- Department Head: `dept.head@miq.digital`
+- Employee: `employee@miq.digital`
+Password: `MiQSecure123!`
 
-- User: `test@test.com`
-- Password: `admin123`
-
-You can also create new users through the `/sign-up` route.
-
-Finally, run the Next.js development server:
+Start the development server:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
+Access the local environment at [http://localhost:3000](http://localhost:3000)
 
-You can listen for Stripe webhooks locally through their CLI to handle subscription change events:
+## Role Testing Matrix
 
-```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-```
+Test different access levels using these credentials:
 
-## Testing Payments
+| Role | Email | Permissions |
+|------|-------|-------------|
+| HR Manager | hr.user@miq.digital | Full employee management |
+| Team Lead | team.lead@miq.digital | Team-specific access |
+| Employee | employee@miq.digital | Basic profile access |
 
-To test Stripe payments, use the following test card details:
+## Compliance & Security
 
-- Card Number: `4242 4242 4242 4242`
-- Expiration: Any future date
-- CVC: Any 3-digit number
+Key security implementations:
+- AES-256 encryption for sensitive employee data
+- GDPR-compliant audit trails
+- SOC 2 Type II compliant infrastructure
+- Regular penetration testing schedules
 
-## Troubleshooting
+## Production Deployment
 
-### Database Migration Issues
+MiQ's portal follows strict deployment protocols:
 
-If you encounter errors when running database migration commands (`pnpm db:generate`, `pnpm db:migrate`, or `pnpm db:push`), try this temporary fix:
+1. Code review through GitHub Enterprise
+2. Security scanning with SonarQube
+3. Deployment to MiQ's private Kubernetes cluster
+4. Post-deploy smoke tests
+5. Final approval from Security team
 
-1. **Modify your connection string** to use port `5432` instead of `6543`:
-```bash
-# Change connection string port to 5432
-POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres"
-```
+## Support & Maintenance
 
-2. **Run your migration commands**:
-```bash
-pnpm db:generate && pnpm db:migrate && pnpm db:push
-```
-
-3. **Revert the port** in your connection string to `6543` after successful migration:
-```bash
-# Restore original port 6543
-POSTGRES_URL="postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
-```
-
-This specific port switch pattern (5432 → run commands → 6543) has been verified to resolve temporary connection issues with Supabase instances during migration operations. Always ensure you:
-- Use your actual database credentials in place of `[YOUR-PASSWORD]`
-- Maintain the same instance hostname throughout
-- Test connections after port changes
-
-### MCP Server with NVM
-
-If you're using NVM (Node Version Manager) and experiencing issues with MCP server detection, it's likely due to path resolution conflicts between NVM-managed Node and system Node installations.
-
-**Problem:**
-- Path resolution conflicts between NVM-managed Node and system Node
-- Global package paths not being properly resolved through NVM's shim system
-
-**Solution:**
-Bypass NVM's path abstraction by explicitly specifying absolute paths in your configuration:
-
-```json
-{
-  "mcpServers": {
-    "puppeteer": {
-      "command": "$HOME/.nvm/versions/node/v22.11.0/bin/node",
-      "args": [
-        "$HOME/.nvm/versions/node/v22.11.0/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
-      ]
-    }
-  }
-}
-```
-
-Replace `v22.11.0` with your actual Node.js version. You can find this by running `node -v` in your terminal.
-
-This configuration explicitly points to:
-1. The NVM-managed Node binary
-2. The globally-installed MCP server package
-
-Avoid using `npx` or local installs that rely on NVM's PATH resolution when working with MCP servers.
-
-## Going to Production
-
-When you're ready to deploy your SaaS application to production, follow these steps:
-
-### Set up a production Stripe webhook
-
-1. Go to the Stripe Dashboard and create a new webhook for your production environment.
-2. Set the endpoint URL to your production API route (e.g., `https://yourdomain.com/api/stripe/webhook`).
-3. Select the events you want to listen for (e.g., `checkout.session.completed`, `customer.subscription.updated`).
-
-### Deploy to Vercel
-
-1. Push your code to a GitHub repository.
-2. Connect your repository to [Vercel](https://vercel.com/) and deploy it.
-3. Follow the Vercel deployment process, which will guide you through setting up your project.
-
-### Add environment variables
-
-In your Vercel project settings (or during deployment), add all the necessary environment variables. Make sure to update the values for the production environment, including:
-
-1. `BASE_URL`: Set this to your production domain.
-2. `STRIPE_SECRET_KEY`: Use your Stripe secret key for the production environment.
-3. `STRIPE_WEBHOOK_SECRET`: Use the webhook secret from the production webhook you created in step 1.
-4. `POSTGRES_URL`: Set this to your production database URL.
-5. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one.
-
-## Other Templates
-
-While this template is intentionally minimal and to be used as a learning resource, there are other paid versions in the community which are more full-featured:
-
-- https://achromatic.dev
-- https://shipfa.st
-- https://makerkit.dev
-- https://zerotoshipped.com
+For production issues or feature requests:
+- Create a ticket in ServiceNow (CATEGORY: People Portal)
+- Emergency P1 issues: +44 20 7946 0811 (MiQ IT 24/7)
+- Follow [IT-3456] change management process for modifications
