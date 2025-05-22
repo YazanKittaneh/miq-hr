@@ -32,7 +32,7 @@ export default function HomePage() {
                   {'Position: ' + user?.jobTitle || ''}
                 </p>
                 <p className="text-lg text-gray-600">
-                  {'Department: ' + user?.department || ''}
+                  {'Department: '} {user?.department || ''}
                 </p>
               </div>
               )}
@@ -40,9 +40,6 @@ export default function HomePage() {
                 <div className="mt-6 flex gap-4">
                   <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
                     Onboarding Status: 60% Complete {/* //todo: make this programatic */}
-                  </span>
-                  <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
-                    Employment Status: Active
                   </span>
                 </div>
               )}

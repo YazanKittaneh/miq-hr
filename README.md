@@ -2,7 +2,7 @@
 
 This is MiQ's internal employee and HR management portal built with **Next.js**. Provides secure access to company resources, employee profiles, and HR tools.
 
-**Staging Environment**: [https://people.miq.digital](https://people.miq.digital)
+**Staging Environment**: [miq-hr-git-preview-yazankittanehs-projects.vercel.app](miq-hr-git-preview-yazankittanehs-projects.vercel.app)
 
 ## Key Features
 
@@ -26,23 +26,23 @@ This is MiQ's internal employee and HR management portal built with **Next.js**.
 - **Framework**: [Next.js](https://nextjs.org/) - Optimized for secure internal applications
 - **Database**: [Postgres](https://www.postgresql.org/) - Enterprise-grade data storage
 - **ORM**: [Drizzle](https://orm.drizzle.team/) - Type-safe database operations
-- **Authentication**: Custom JWT implementation - Integrated with MiQ's SSO
+- **Authentication**: Supabase Auth
 - **UI Library**: [shadcn/ui](https://ui.shadcn.com/) - Accessible internal tooling components
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/miq-digital/people-portal
-cd people-portal
+git clone https://github.com/YazanKittaneh/miq-hr
+cd miq-hr
 pnpm install
 ```
 
 ## Local Configuration
 
-1. Set up environment variables using MiQ's internal configuration tool:
+1. Use the included setup script to create your .env file:
 
 ```bash
-pnpm setup:miq
+pnpm db:setup
 ```
 
 2. Run database migrations with test data:
