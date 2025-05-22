@@ -269,9 +269,13 @@ function InviteTeamMember() {
 }
 
 export default function SettingsPage() {
+  const { data: user } = useSWR<User>('/api/user', fetcher);
+
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
+      <h1 className="text-lg lg:text-2xl font-medium mb-6">
+        {user?.name ? `Welcome ${user.name}` : 'Welcome to MIQ People Portal'}
+      </h1>
       <Suspense fallback={<TeamMembersSkeleton />}>
         <TeamMembers />
       </Suspense>
